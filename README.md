@@ -42,7 +42,7 @@ Then configure and run the superbuild as follows:
 
 ```shell
 # Run the bootstrap script in mc-rtc-superbuild/utils folder if required
-cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
+cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/workspace/src -DBUILD_DESTINATION=${HOME}/workspace/build -DCMAKE_INSTALL_PREFIX=${HOME}/workspace/install
 cmake --build mc-rtc-superbuild/build --target install --config RelWithDebInfo
 ```
 
@@ -68,8 +68,7 @@ If you want to clone everything before attempting the first build you can use th
 
 ```shell
 git clone https://github.com/mc-rtc/mc-rtc-superbuild
-cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
-cd mc-rtc-superbuild/build
+cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/workspace/src -DBUILD_DESTINATION=${HOME}/workspace/build -DCMAKE_INSTALL_PREFIX=${HOME}/workspace/install
 cmake --build . --config RelWithDebInfo --target clone
 cmake --build . --config RelWithDebInfo
 ```

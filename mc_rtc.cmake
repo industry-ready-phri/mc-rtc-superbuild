@@ -85,8 +85,8 @@ endif()
 
 AddProject(
   RBDyn
-  GITHUB jrl-umi3218/RBDyn
-  GIT_TAG origin/master
+  GITHUB mathieu-celerier/RBDyn
+  GIT_TAG origin/topic/RotorInertia
   DEPENDS SpaceVecAlg
   APT_PACKAGES librbdyn-dev python-rbdyn python3-rbdyn
 )
@@ -162,7 +162,7 @@ endif()
 
 AddProject(
   tvm
-  GITHUB jrl-umi3218/tvm
+  GITHUB bastien-muraccioli/tvm
   GIT_TAG origin/master
   DEPENDS eigen-qld eigen-quadprog lexls ${tvm_EXTRA_DEPENDS}
   CMAKE_ARGS -DTVM_WITH_QLD:BOOL=ON
@@ -223,8 +223,8 @@ else()
 endif()
 AddProject(
   mc_rtc
-  GITHUB jrl-umi3218/mc_rtc
-  GIT_TAG origin/master
+  GITHUB bastien-muraccioli/mc_rtc
+  GIT_TAG origin/main-temp
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
