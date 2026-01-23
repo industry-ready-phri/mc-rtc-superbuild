@@ -6,11 +6,14 @@ if(NOT EXISTS "${SOURCE_DIR}/.git")
   return()
 endif()
 
-# Skip update for fixed tags
-# It is technically possible to reposition a tag but we accept the risk
+# Skip update for fixed tags It is technically possible to reposition a tag but we
+# accept the risk
 if(DEFINED GIT_TAG AND NOT GIT_TAG MATCHES "^origin/(.*)")
   message("[SKIP] Update ${NAME}: fixed to ${GIT_TAG}")
   return()
+else()
+  set(GIT_BRANCH_NAME "${GIT_TAG}")
+  string(REGEX REPLACE "^origin/" "" GIT_BRANCH_NAME "${GIT_BRANCH_NAME}")
 endif()
 
 # We check that our work tree is clean and matches the desired branch
@@ -43,7 +46,6 @@ if(git_diff_err)
   return()
 endif()
 
-
 # Find the current remote branch
 execute_process(
   COMMAND git rev-parse --abbrev-ref --symbolic-full-name @{u}
@@ -60,6 +62,33 @@ endif()
 
 if(DEFINED GIT_TAG AND NOT "${CURRENT_REMOTE_BRANCH}" STREQUAL "${GIT_TAG}")
   message("[SKIP] Update ${NAME}: not tracking ${GIT_TAG}")
+  return()
+endif()
+
+# Check if branches have diverged
+# - `REMOTE_AHEAD_COUNT`: commits on remote not on local.
+# - `LOCAL_AHEAD_COUNT`: commits on local not on remote.
+# - If both are non-zero, branches have diverged.
+
+# Get commit counts
+execute_process(
+  COMMAND git rev-list --count ${GIT_BRANCH_NAME}..origin/${GIT_BRANCH_NAME}
+  WORKING_DIRECTORY "${SOURCE_DIR}"
+  OUTPUT_VARIABLE REMOTE_AHEAD_COUNT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+  COMMAND git rev-list --count origin/${GIT_BRANCH_NAME}..${GIT_BRANCH_NAME}
+  WORKING_DIRECTORY "${SOURCE_DIR}"
+  OUTPUT_VARIABLE LOCAL_AHEAD_COUNT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Detect divergence
+if(NOT REMOTE_AHEAD_COUNT STREQUAL "0" AND NOT LOCAL_AHEAD_COUNT STREQUAL "0")
+  message(
+    "[SKIP] Update ${NAME}: local and remote branches have diverged, manual merge/rebase required"
+  )
   return()
 endif()
 
@@ -94,12 +123,14 @@ execute_process(
   OUTPUT_QUIET ERROR_QUIET
 )
 
-if(DEFINED PRE_COMMIT AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml" AND EXISTS "${SOURCE_DIR}/.git")
+if(DEFINED PRE_COMMIT
+   AND EXISTS "${PRE_COMMIT}"
+   AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml"
+   AND EXISTS "${SOURCE_DIR}/.git"
+)
   execute_process(
-    COMMAND ${PRE_COMMIT} install
-    WORKING_DIRECTORY ${SOURCE_DIR}
-    OUTPUT_QUIET ERROR_QUIET
-    COMMAND_ERROR_IS_FATAL ANY
+    COMMAND ${PRE_COMMIT} install WORKING_DIRECTORY ${SOURCE_DIR}
+                                                    COMMAND_ERROR_IS_FATAL ANY
   )
 endif()
 

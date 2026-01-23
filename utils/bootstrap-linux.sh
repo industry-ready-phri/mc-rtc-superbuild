@@ -19,7 +19,11 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y wget apt-transport-https gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip
+${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip ccache
+if [[ `lsb_release -cs` == "noble" ]]
+then
+  ${SUDO} apt-get install -y --no-install-recommends pipx
+fi
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then
@@ -30,12 +34,17 @@ then
 else
   CMAKE_VERSION="3.22.1"
   CMAKE_VERSION_FULL="${CMAKE_VERSION}-linux-$(uname -m)"
-  wget -O /tmp/cmake-${CMAKE_VERSION_FULL}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION_FULL}.sh
+  wget -O /tmp/cmake-${CMAKE_VERSION_FULL} https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION_FULL}.sh
   chmod +x /tmp/cmake-${CMAKE_VERSION_FULL}
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
 
 if [[ ! -f $HOME/.local/bin/pre-commit ]]
 then
-  /usr/bin/python3 -m pip install --user pre-commit
+  if [[ `lsb_release -cs` == "noble" ]]
+  then
+    pipx install pre-commit
+  else
+    /usr/bin/python3 -m pip install --user pre-commit
+  fi
 fi

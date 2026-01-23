@@ -1,0 +1,73 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/../workspace/build/superbuild",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
+                "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install"
+            }
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF"
+            }
+        },
+        {
+            "name": "relwithdebinfo-noble",
+            "displayName": "RelWithDebInfo (noble, no ROS, no Python)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF",
+		"WITH_ROS_SUPPORT": "OFF"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "$env{UBUNTU_VERSION}",
+                "rhs": "noble"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "configurePreset": "relwithdebinfo-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-noble",
+            "displayName": "RelWithDebInfo (ubuntu noble)",
+            "configurePreset": "relwithdebinfo-noble",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,34 @@
+name: Package Devcontainers Reusable
+
+on:
+  repository_dispatch:
+    types:
+      - build-jammy
+      - build-noble
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  package-devcontainers:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [jammy, noble]
+    uses: jrl-umi3218/github-actions/.github/workflows/superbuild-devcontainer.yml@master
+    with:
+      runner: ubuntu-24.04
+      free-disk-space: true
+      os: ${{ matrix.os }}
+      preset: relwithdebinfo${{ matrix.os == 'noble' && '-noble' || '' }}
+      include-preset-in-name: false
+      build-standalone-release: true
+      build-standalone-devel: true
+      build-devcontainer: true
+      container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
+      push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+    secrets:
+      SSH_KEY: ${{ secrets.SSH_KEY }}

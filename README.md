@@ -38,16 +38,23 @@ By using this repository, you can reproduce the experiments from the paper, test
 
 ## Installation
 
-### 1. Clone the Repository
+First, make sure you have configured `git`:
+```sh
+git config --global user.name "Full Name"
+git config --global user.email "your.email@provider.com"
+```
+
+### 1. Clone the Repository in your Workspace
 
 ```sh
-git clone https://github.com/yourusername/industry-ready-phri.git
+mkdir -p ~/workspace && cd ~/workspace
+git clone https://github.com/industry-ready-phri/mc-rtc-superbuild.git
 ```
 
 ### 2. Bootstrap the Environment
 Navigate to the cloned repository’s superbuild folder:
 ```sh
-cd industry-ready-phri/mc-rtc-superbuild
+cd ~/workspace/mc-rtc-superbuild
 ```
 
 Then run the bootstrap script to install system dependencies:
@@ -66,72 +73,146 @@ Then run the bootstrap script to install system dependencies:
 Configure the superbuild by specifying where the source code should be cloned and where the build files will be generated. For example:
 
 ```sh
-cmake -S . -B build \
-  -DSOURCE_DESTINATION=${HOME}/devel/src \
-  -DBUILD_DESTINATION=${HOME}/devel/build \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cd ~/workspace
+cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/workspace/src -DBUILD_DESTINATION=${HOME}/workspace/build -DCMAKE_INSTALL_PREFIX=${HOME}/workspace/install
 ```
 
 Then, build the complete project:
 ```sh
-cmake --build build --config RelWithDebInfo
+cmake --build mc-rtc-superbuild/build --target install --config RelWithDebInfo
 ```
+
+Please make sure to copy given source command to your `bashrc` or `zshrc`.
+If they are not provided try to do:
+```bash
+cd ~/workspace/mc-rtc-superbuild/build
+cmake .
+```
+
+Otherwise you should add at least (edit username and python version):
+```bash
+export PATH=/home/{$USER}/workspace/install/bin:$PATH
+export PKG_CONFIG_PATH=/home/{$USER}/workspace/install/lib/pkgconfig:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=/home/{$USER}/workspace/install/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/home/{$USER}/workspace/install/lib/python3.{$VERSION}/site-packages:$PYTHONPATH
+source /home/{$USER}/workspace/src/catkin_ws/install/setup.bash
+```
+
+You can execute the command `ccmake .` in the build folder (`~/workspace/mc-rtc-superbuild/build`) to look at the available options (You need to install at least the documentation to use Rviz). NB: You may need to build again after ccmake
+
+If you encounter an error with this file: ~/workspace/src/catkin_data_ws/install/share/kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_macro.xacro --> You can remove the arguments after use_fake_hardware (the lines with: mock_sensor_commands, sim_gazebo, sim_isaac, isaac_joint_commands, isaac_joint_states)
+
+If you want to use the bota sensor you must install the bota_driver in ~/workspace/src/catkin_data/src and follow the official tutorial here: https://gitlab.com/botasys/legacy/bota_driver/-/tree/iron-devel?ref_type=heads
 
 ---
 
-## Usage
-
-After a successful build, the projects built by the superbuild are ready for use. You can:
-
-- Run experiments: Launch simulation or control applications as described in the paper.
-- Rebuild projects: If you modify the source, simply rebuild using:
-```sh
-cmake --build build --config RelWithDebInfo
+# Files to create
+-  mc_rtc config file:
+```shell
+mkdir -p ~/.config/mc_rtc && nano ~/.config/mc_rtc/mc_rtc.yaml
 ```
-- Clone repositories separately: To clone all repositories without building immediately, use:
-```sh
-cmake --build build --config RelWithDebInfo --target clone
+	With this content:
+```yaml
+# MainRobot: Kinova
+MainRobot: KinovaCamera
+# MainRobot: KinovaCameraGripper
+# MainRobot: KinovaBotaDS4
+# MainRobot: KinovaBota
+Enabled: MonodzukuriKinovaDemo
+Plugins: [ExternalForcesEstimator, mc_joystick_plugin]
+Timestep: 0.001
+LogPolicy: threaded
+
+Kortex:
+  init_posture:
+    on_startup: false
+    posture: [0.0,0.4173, 3.1292, -2.1829, 0.0, 1.0342, 1.5226]
+  torque_control:
+    mode: custom
+    lambda: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    friction_compensation:
+        velocity_threshold: 0.05 # in rad
+        acceleration_threshold: 5 # in rad, for cases where velocity is below threshold
+        stiction: [2.7, 2.7, 2.7, 2.7, 1.5, 1.5, 1.5]
+        coulomb: [2.7, 2.7, 2.7, 2.7, 1.5, 1.5, 1.5]
+        viscous: [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+    integral_term:
+      theta: 2
+      gain: 10
+
+  kinova: # Name of the robot in the controller
+    ip: 192.168.1.10
+    username: admin
+    password: admin
+
+  kinova_bota: # Name of the robot in the controller
+    ip: 192.168.1.10
+    username: admin
+    password: admin
+
+  kinova_bota_ds4: # Name of the robot in the controller
+    ip: 192.168.1.10
+    username: admin
+    password: admin
+
+  kinova_camera: # Name of the robot in the controller
+    ip: 192.168.1.10
+    username: admin
+    password: admin
+
+  kinova_camera_gripper: # Name of the robot in the controller
+    ip: 192.168.1.10
+    username: admin
+    password: admin
 ```
 
-## Updating the Code Base
-
-To update all the cloned repositories with the latest changes, run:
-
-```sh
-cmake --build build --config RelWithDebInfo --target update
+-  external forces plugin config file:
+```shell
+mkdir -p ~/.config/mc_rtc/plugins && nano ~/.config/mc_rtc/plugins/ExternalForcesEstimator.yaml
+```
+	With this content:
+```yaml
+# KinovaGen3
+residual_gain: 50
+# reference_frame: tool_frame
+reference_frame: end_effector_link
+verbose: false
+ft_sensor_name: none
+use_force_sensor: false
+# ft_sensor_name: EEForceSensor
+# use_force_sensor: true
+torque_source_type: JointTorqueMeasurement
+residual_speed_gain: 100
 ```
 
-Or update a specific project (e.g., mc_rtc):
-
-```sh
-cmake --build build --config RelWithDebInfo --target update-mc_rtc
+# Some convenient alias to add to .bashrc
+-  building mc_rtc:
+```
+alias mc_build='cd ~/workspace/mc-rtc-superbuild/build; cmake --build . --config RelWithDebInfo'
+```
+-  Launch rviz:
+```
+alias mc_rviz="ros2 launch mc_rtc_ticker display.launch" 
+```
+-  Modify the mc_rtc config:
+```
+alias mc_config="nano ~/.config/mc_rtc/mc_rtc.yaml &" 
+```
+# Running time
+#### To run the controller in simulation
+```bash
+mc_mujoco --sync
+```
+#### To run the controller on the real-robot
+```
+mc_kortex
+```
+#### For the GUI on real-robot
+```shell
+mc_rviz
 ```
 
-For updating the superbuild itself along with any extensions:
-
-```sh
-cmake --build build --config RelWithDebInfo --target self-update
-```
-
-## Uninstallation
-
-If you need to remove the installed projects, you can uninstall everything at once:
-
-```sh
-cmake --build build --target uninstall
-```
-
-(Note: You might need sudo if the installation prefix requires elevated privileges.)
-
----
-
-## Extensions and Customization
-
-This code base is designed to be flexible. You can extend the framework by:
-
-- Adding new projects via the main CMakeLists.txt (look for PERSONAL_PROJECTS).
-- Creating new extensions under the extensions folder.
-- Modifying or adding CMake options to suit specific experimental setups.
+## Details
 
 For further details on how to extend the superbuild, please refer to the original [mc-rtc-superbuild documentation](https://github.com/mc-rtc/mc-rtc-superbuild).
 
@@ -140,6 +221,18 @@ For further details on how to extend the superbuild, please refer to the origina
 ## Citation
 
 If you use this code in your research, please cite the paper as follows:
+
+```BibTex
+@INPROCEEDINGS{muraccioli2025rss, 
+    AUTHOR    = {Bastien Muraccioli AND Mathieu Celerier AND Mehdi Benallegue AND Gentiane Venture}, 
+    TITLE     = {{Demonstrating a Control Framework for Physical Human-Robot Interaction Toward Industrial Applications}}, 
+    BOOKTITLE = {Proceedings of Robotics: Science and Systems}, 
+    YEAR      = {2025}, 
+    ADDRESS   = {LosAngeles, CA, USA}, 
+    MONTH     = {June}, 
+    DOI       = {10.15607/RSS.2025.XXI.084} 
+}
+```
 
 ---
 
