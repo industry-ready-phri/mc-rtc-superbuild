@@ -107,11 +107,12 @@ If you want to use the bota sensor you must install the bota_driver in ~/workspa
 ---
 
 # Files to create
--  mc_rtc config file:
+###  mc_rtc config file:
 ```shell
 mkdir -p ~/.config/mc_rtc && nano ~/.config/mc_rtc/mc_rtc.yaml
 ```
-	With this content:
+With this content:
+
 ```yaml
 # MainRobot: Kinova
 MainRobot: KinovaCamera
@@ -166,11 +167,13 @@ Kortex:
     password: admin
 ```
 
--  external forces plugin config file:
+###  External forces plugin config file:
 ```shell
 mkdir -p ~/.config/mc_rtc/plugins && nano ~/.config/mc_rtc/plugins/ExternalForcesEstimator.yaml
 ```
-	With this content:
+
+With this content:
+	
 ```yaml
 # KinovaGen3
 residual_gain: 50
@@ -199,6 +202,7 @@ alias mc_rviz="ros2 launch mc_rtc_ticker display.launch"
 alias mc_config="nano ~/.config/mc_rtc/mc_rtc.yaml &" 
 ```
 # Running time
+
 #### To run the controller in simulation
 ```bash
 mc_mujoco --sync
@@ -211,6 +215,38 @@ mc_kortex
 ```shell
 mc_rviz
 ```
+
+### Kinova Gen3 – Required setup before running on the real robot
+
+Before running the `mc_kortex` command, make sure the robot is in the **home position**. In addition, you must reset the **joint torque sensors** every time the robot is powered on and periodically during operation (approximately once per hour).
+
+To reset the torque offsets, open the [Kinova web application](http://192.168.1.10/monitoring):
+
+1. **Move the robot to the zero position**
+
+   * Click **Actions**.
+   * Select **Zero**.
+   * Press the **Play** button and wait until the robot reaches the zero position.
+
+2. **Reset the torque offsets**
+
+   * Click the **three-line menu** (top left).
+   * Go to **Configurations → Robot**.
+   * In the **Arm** tab, select **Base**.
+   * Click **Set All Actuators Torque Offset to Zero**.
+
+3. **Verify the reset**
+
+   * Open the **three-line menu** again.
+   * Go to **Systems → Monitoring**.
+   * Check that all actuator torque values are close to zero.
+
+4. **Return the robot to the home position**
+
+   * Use the same procedure as above via **Actions**, **or**
+   * Press the **`B` button** on the Kinova Xbox controller.
+
+Only after completing these steps should you start the controller on the real robot.
 
 ## Details
 
