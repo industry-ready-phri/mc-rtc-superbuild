@@ -31,8 +31,7 @@ By using this repository, you can reproduce the experiments from the paper, test
 - **Git**  
   [Download Git](https://git-scm.com/)
 - **Build Tools** (e.g., `build-essential` on Debian/Ubuntu)  
-- **Operating System:** Tested on Linux (Debian/Ubuntu) and macOS  
-  *(For Windows users, Visual Studio 2019 or later is required.)*
+- **Operating System:** Tested on Ubuntu 24.04 LTS.
 
 ---
 
