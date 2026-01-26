@@ -228,20 +228,22 @@ To reset the torque offsets, open the [Kinova web application](http://192.168.1.
    * Select **Zero**.
    * Press the **Play** button and wait until the robot reaches the zero position.
 
-2. **Reset the torque offsets**
+Note: Calibrating torque offsets in a different configuration may result in non-zero residual torques, which can negatively affect external force estimation and overall safety.
+
+3. **Reset the torque offsets**
 
    * Click the **three-line menu** (top left).
    * Go to **Configurations → Robot**.
    * In the **Arm** tab, select **Base**.
    * Click **Set All Actuators Torque Offset to Zero**.
 
-3. **Verify the reset**
+4. **Verify the reset**
 
    * Open the **three-line menu** again.
    * Go to **Systems → Monitoring**.
    * Check that all actuator torque values are close to zero.
 
-4. **Return the robot to the home position**
+5. **Return the robot to the home position**
 
    * Use the same procedure as above via **Actions**, **or**
    * Press the **`B` button** on the Kinova Xbox controller.
