@@ -85,8 +85,8 @@ endif()
 
 AddProject(
   RBDyn
-  GITHUB jrl-umi3218/RBDyn
-  GIT_TAG origin/master
+  GITHUB mathieu-celerier/RBDyn
+  GIT_TAG origin/topic/RotorInertia
   DEPENDS SpaceVecAlg
   APT_PACKAGES librbdyn-dev python-rbdyn python3-rbdyn
 )
@@ -224,7 +224,7 @@ endif()
 AddProject(
   mc_rtc
   GITHUB bastien-muraccioli/mc_rtc
-  GIT_TAG origin/master
+  GIT_TAG origin/main-temp
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}

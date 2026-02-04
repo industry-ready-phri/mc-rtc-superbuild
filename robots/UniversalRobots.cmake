@@ -21,7 +21,7 @@ if(WITH_MC_RTDE)
 
   # For CB>=3 support
   find_package(ur_rtde QUIET)
-  if(NOT ${ur_rtde_FOUND})
+  if(NOT ${rtde_FOUND})
     addaptrepository("ppa:sdurobotics/ur-rtde")
     AptInstall(librtde librtde-dev)
   endif()
