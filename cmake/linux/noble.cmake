@@ -2,7 +2,7 @@ set(MC_LOG_UI_PYTHON_EXECUTABLE python3)
 set(APT_HAS_PYTHON2_PACKAGES OFF)
 set(ROS_IS_ROS2 ON)
 set(ROS_DISTRO jazzy)
-set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.10/site-packages")
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.12/site-packages")
 set(APT_DEPENDENCIES
     curl
     wget
